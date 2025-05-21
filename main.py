@@ -20,6 +20,9 @@ def get_pepe_price():
     try:
         response = requests.get(url)
         data = response.json()
+        print("🔍 Binance Response:", data)  # Log for debugging
+        if "price" not in data:
+            raise ValueError("Missing 'price' in response")
         return float(data["price"])
     except Exception as e:
         return f"Error: {e}"
