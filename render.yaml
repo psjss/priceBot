@@ -6,7 +6,7 @@ services:
     startCommand: "python main.py"
     autoDeploy: true
     envVars:
-      - key: BOT_TOKEN
+      - key: 7429224365:AAEVw5fDYIytSO54rXJOsWOBpQ8tatHOfOE
         sync: false
-      - key: CHAT_ID
+      - key: 463008392
         sync: false
