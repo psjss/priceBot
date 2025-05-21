@@ -19,8 +19,8 @@ def get_pepe_price():
     url = "https://api.coingecko.com/api/v3/simple/price?ids=pepe&vs_currencies=usd"
     try:
         response = requests.get(url)
+        print("🛰️ Raw Response:", response.text)  # ← Add this line
         data = response.json()
-        print("🧠 CoinGecko Response:", data)
         if "pepe" not in data or "usd" not in data["pepe"]:
             raise ValueError("Missing PEPE price in response")
         return float(data["pepe"]["usd"])
