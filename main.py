@@ -16,17 +16,14 @@ def home():
     return "PEPE bot is running ✅"
 
 def get_pepe_price():
-    url = "https://api.binance.com/api/v3/ticker/price?symbol=PEPEUSDT"
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
+    url = "https://api.coingecko.com/api/v3/simple/price?ids=pepe&vs_currencies=usd"
     try:
-        response = requests.get(url, headers=headers)
+        response = requests.get(url)
         data = response.json()
-        print("🔍 Binance Response:", data)
-        if "price" not in data:
-            raise ValueError("Missing 'price' in response")
-        return float(data["price"])
+        print("🧠 CoinGecko Response:", data)
+        if "pepe" not in data or "usd" not in data["pepe"]:
+            raise ValueError("Missing PEPE price in response")
+        return float(data["pepe"]["usd"])
     except Exception as e:
         return f"Error: {e}"
 
