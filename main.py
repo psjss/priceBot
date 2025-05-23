@@ -17,6 +17,7 @@ def home():
 
 latest_price = None  # Global variable
 
+
 def get_pepe_price():
     global latest_price
     url = "https://api.binance.com/api/v3/ticker/price?symbol=PEPEUSDT"
