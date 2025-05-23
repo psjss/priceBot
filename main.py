@@ -17,13 +17,16 @@ def home():
 
 def get_pepe_price():
     url = "https://api.binance.com/api/v3/ticker/price?symbol=PEPEUSDT"
+    headers = {
+        "User-Agent": "Mozilla/5.0"
+    }
     try:
-        response = requests.get(url)
-        print("🛰️ Raw Response:", response.text)  # ← Add this line
+        response = requests.get(url, headers=headers)
+        print("🛰️ Raw Binance Response:", response.text)
         data = response.json()
-        if "pepe" not in data or "usd" not in data["pepe"]:
-            raise ValueError("Missing PEPE price in response")
-        return float(data["pepe"]["usd"])
+        if "price" not in data:
+            raise ValueError("Missing 'price' in response")
+        return float(data["price"])
     except Exception as e:
         return f"Error: {e}"
 
