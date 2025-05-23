@@ -35,7 +35,7 @@ def send_regular_update():
         else:
             message = f"⚠️ Error fetching PEPE price:\n{price}"
         bot.send_message(chat_id=chat_id, text=message)
-        time.sleep(1800)
+        time.sleep(600)
 
 def monitor_volatility():
     last_price = get_pepe_price()
