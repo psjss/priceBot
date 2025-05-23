@@ -16,7 +16,7 @@ def home():
     return "PEPE bot is running ✅"
 
 def get_pepe_price():
-    url = "https://api.coingecko.com/api/v3/simple/price?ids=pepe&vs_currencies=usd"
+    url = "https://api.binance.com/api/v3/ticker/price?symbol=PEPEUSDT"
     try:
         response = requests.get(url)
         print("🛰️ Raw Response:", response.text)  # ← Add this line
