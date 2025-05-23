@@ -15,20 +15,24 @@ app = Flask(__name__)
 def home():
     return "PEPE bot is running ✅"
 
+latest_price = None  # Global variable
+
 def get_pepe_price():
+    global latest_price
     url = "https://api.binance.com/api/v3/ticker/price?symbol=PEPEUSDT"
     headers = {
         "User-Agent": "Mozilla/5.0"
     }
     try:
         response = requests.get(url, headers=headers)
-        print("🛰️ Raw Binance Response:", response.text)
         data = response.json()
         if "price" not in data:
             raise ValueError("Missing 'price' in response")
-        return float(data["price"])
+        latest_price = float(data["price"])
+        return latest_price
     except Exception as e:
-        return f"Error: {e}"
+        print(f"⚠️ Fetch error: {e}")
+        return latest_price if latest_price else f"Error: {e}"
 
 def send_regular_update():
     while True:
