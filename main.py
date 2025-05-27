@@ -13,55 +13,66 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "PEPE bot is running ✅"
+    return "PEPE + ETH Bot is running ✅"
 
-latest_price = None  # Global variable
+latest_pepe_price = None
+latest_eth_price = None
+pepe_price_history = []
 
-
-def get_pepe_price():
-    global latest_price
-    url = "https://api.binance.com/api/v3/ticker/price?symbol=PEPEUSDT"
-    headers = {
-        "User-Agent": "Mozilla/5.0"
-    }
+# === Fetch price from Binance ===
+def fetch_price(symbol):
+    url = f"https://api.binance.com/api/v3/ticker/price?symbol={symbol}"
     try:
-        response = requests.get(url, headers=headers)
-        data = response.json()
-        if "price" not in data:
-            raise ValueError("Missing 'price' in response")
-        latest_price = float(data["price"])
-        return latest_price
+        res = requests.get(url, timeout=10)
+        return float(res.json()['price'])
     except Exception as e:
-        print(f"⚠️ Fetch error: {e}")
-        return latest_price if latest_price else f"Error: {e}"
+        print(f"Error fetching {symbol} price: {e}")
+        return None
 
+# === Regular 10-min updates for PEPE + ETH ===
 def send_regular_update():
+    global latest_pepe_price, latest_eth_price
     while True:
-        price = get_pepe_price()
-        if isinstance(price, float):
-            message = f"📈 PEPE Price Update:\n\n💰 ${price:.8f} USD (Binance)"
-        else:
-            message = f"⚠️ Error fetching PEPE price:\n{price}"
-        bot.send_message(chat_id=chat_id, text=message)
+        pepe_price = fetch_price("PEPEUSDT")
+        eth_price = fetch_price("ETHUSDT")
+
+        if pepe_price and eth_price:
+            latest_pepe_price = pepe_price
+            latest_eth_price = eth_price
+
+            message = (
+                f"📊 10-Minute Price Update:\n"
+                f"🐸 PEPE: ${pepe_price:.8f}\n"
+                f"💠 ETH: ${eth_price:,.2f}"
+            )
+            bot.send_message(chat_id=chat_id, text=message)
+
         time.sleep(600)
 
+# === 5-min PEPE volatility monitor ===
 def monitor_volatility():
-    last_price = get_pepe_price()
+    global pepe_price_history
     while True:
-        time.sleep(300)
-        current_price = get_pepe_price()
-        if isinstance(last_price, float) and isinstance(current_price, float):
-            change = ((current_price - last_price) / last_price) * 100
-            if abs(change) >= 2:
-                direction = "📈 Up" if change > 0 else "📉 Down"
-                alert = (
-                    f"🚨 PEPE Sudden Move Alert ({direction})\n\n"
-                    f"Old: ${last_price:.8f}\n"
-                    f"Now: ${current_price:.8f}\n"
-                    f"Change: {change:.2f}% in 5 mins!"
-                )
-                bot.send_message(chat_id=chat_id, text=alert)
-        last_price = current_price
+        pepe_price = fetch_price("PEPEUSDT")
+        if pepe_price:
+            pepe_price_history.append(pepe_price)
+            if len(pepe_price_history) > 5:
+                pepe_price_history.pop(0)
+
+            if len(pepe_price_history) == 5:
+                old = pepe_price_history[0]
+                change = ((pepe_price - old) / old) * 100
+                if abs(change) >= 2:
+                    direction = "📈 Up" if change > 0 else "📉 Down"
+                    alert = (
+                        f"🚨 PEPE Sudden Move Alert ({direction})\n\n"
+                        f"Old: ${old:.8f}\n"
+                        f"Now: ${pepe_price:.8f}\n"
+                        f"Change: {change:.2f}% in 5 mins!"
+                    )
+                    bot.send_message(chat_id=chat_id, text=alert)
+
+        time.sleep(60)
 
 if __name__ == "__main__":
     threading.Thread(target=send_regular_update).start()
