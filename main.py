@@ -13,10 +13,10 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return "PEPE + BTC Bot is running ✅"
+    return "PEPE + ETH Bot is running ✅"
 
 latest_pepe_price = None
-latest_btc_price = None
+latest_eth_price = None
 pepe_price_history = []
 
 # === Fetch price from Binance ===
@@ -29,21 +29,21 @@ def fetch_price(symbol):
         print(f"Error fetching {symbol} price: {e}")
         return None
 
-# === Regular 10-min updates for PEPE + BTC ===
+# === Regular 10-min updates for PEPE + ETH ===
 def send_regular_update():
-    global latest_pepe_price, latest_btc_price
+    global latest_pepe_price, latest_eth_price
     while True:
         pepe_price = fetch_price("PEPEUSDT")
-        btc_price = fetch_price("BTCUSDT")
+        eth_price = fetch_price("ETHUSDT")
 
-        if pepe_price and btc_price:
+        if pepe_price and eth_price:
             latest_pepe_price = pepe_price
-            latest_btc_price = btc_price
+            latest_eth_price = eth_price
 
             message = (
                 f"📊 10-Minute Price Update:\n"
                 f"🐸 PEPE: ${pepe_price:.8f}\n"
-                f"💠 BTC: ${btc_price:,.2f}"
+                f"💠 ETH: ${eth_price:,.2f}"
             )
             bot.send_message(chat_id=chat_id, text=message)
 
